@@ -7,7 +7,7 @@ SCREEN_TITLE = "Maze Runner"
 CHARACTER_SCALING = 0.5
 TILE_SCALING = 0.25
 PLAYER_MOVEMENT_SPEED = 2.5
-#nothing
+#Peter wrote this
 
 class maze(arcade.Window):
  
