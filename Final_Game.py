@@ -4,8 +4,8 @@ SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 700
 SCREEN_TITLE = "Maze Runner"
 
-CHARACTER_SCALING = 0.5
-TILE_SCALING = 0.25
+CHARACTER_SCALING = 0.42
+TILE_SCALING = 0.22
 PLAYER_MOVEMENT_SPEED = 2.5
 #Peter wrote this
 
@@ -38,11 +38,31 @@ class maze(arcade.Window):
         self.player = arcade.Sprite(image_source, CHARACTER_SCALING)
 
         #TODO use algorithm to find possible start and end point of maze
-        self.player.center_x = 100
-        self.player.center_y = 100
+        self.player.center_x = 2
+        self.player.center_y = 2
 
         #TODO: implement randomized maze algorithm (Dijkstras / Depth First Search)
+        # Hardcoded right now to test maze wall creation
+        maze = [
+        [1, 0, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+        [1, 0, 1, 0, 1, 1, 1, 1, 0, 1],
+        [1, 0, 1, 0, 0, 0, 0, 1, 0, 1],
+        [1, 0, 1, 0, 1, 1, 0, 1, 1, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        ]
 
+
+        for x in range(len(maze)):
+            for y in range(len(maze[x])):
+                if maze[x][y] == 1:
+                    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", TILE_SCALING)
+                    wall.position = (((x * 35) + 100), ((y * 35) + 100))    
+                    self.wall_list.append(wall)
+                    self.scene.add_sprite("Walls", wall)        
+
+        '''
         #use this for loop to generate the locations of boxes
         coordinate_list = [[10, 20], [30, 96]]
         for coordinate in coordinate_list:
@@ -50,6 +70,7 @@ class maze(arcade.Window):
             wall.position = coordinate
             self.wall_list.append(wall)
             self.scene.add_sprite("Walls", wall)
+        '''
 
         #physics engine for walls (collide)
         self.wall_collide = arcade.PhysicsEngineSimple(self.player, self.scene.get_sprite_list("Walls"))
