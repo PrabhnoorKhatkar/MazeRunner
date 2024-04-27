@@ -1,4 +1,5 @@
 import arcade
+import random
 
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 700
@@ -8,6 +9,64 @@ CHARACTER_SCALING = 0.42
 TILE_SCALING = 0.22
 PLAYER_MOVEMENT_SPEED = 2.5
 #Peter wrote this
+
+
+
+def mazeGeneration():
+    '''
+    1.Start with a grid full of walls.
+    2. Pick a cell, mark it as part of the maze. Add the walls of the cell to the wall list.
+    3.While there are walls in the list:
+        1.Pick a random wall from the list. If only one of the cells that the wall divides is visited, then:
+            1.Make the wall a passage and mark the unvisited cell as part of the maze.
+            2.Add the neighboring walls of the cell to the wall list.
+        2.Remove the wall from the list.
+    '''
+    #1
+            # do this  for this collection   for this collection
+    maze = [[1 for x in range(0,25)] for x in range(0,25)]
+    #2
+    x = random.choice(range(1,24))
+    y = random.choice(range(1,24))
+    maze[x,y] = 0
+    wallList = []
+    if(maze[x-1, y] == 1):
+        wallList.append((x-1,y))
+    if(maze[x+1, y] == 1):
+        wallList.append((x+1,y))
+    if(maze[x, y-1] == 1):
+        wallList.append((x,y-1))
+    if(maze[x, y+1] == 1):
+        wallList.append((x,y+1))
+
+    '''
+    1.Start with a grid full of walls.
+    2. Pick a cell, mark it as part of the maze. Add the walls of the cell to the wall list.
+    3.While there are walls in the list:
+        1.Pick a random wall from the list. If only one of the cells that the wall divides is visited, then:
+            1.Make the wall a passage and mark the unvisited cell as part of the maze.
+            2.Add the neighboring walls of the cell to the wall list.
+        2.Remove the wall from the list.
+    '''
+    #3
+    while(wallList.isEmpty()):
+        randomIndex = random.choice(range(0, len(wallList)))
+        randomWall = wallList[randomIndex]
+        if(randomWall):
+            
+
+
+
+    
+
+    
+
+
+
+
+
+    return maze
+
 
 class maze(arcade.Window):
  
@@ -43,15 +102,9 @@ class maze(arcade.Window):
 
         #TODO: implement randomized maze algorithm (Dijkstras / Depth First Search)
         # Hardcoded right now to test maze wall creation
-        maze = [
-        [1, 0, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-        [1, 0, 1, 0, 1, 1, 1, 1, 0, 1],
-        [1, 0, 1, 0, 0, 0, 0, 1, 0, 1],
-        [1, 0, 1, 0, 1, 1, 0, 1, 1, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-        ]
+       
+        maze = mazeGeneration()
+
 
 
         for x in range(len(maze)):
