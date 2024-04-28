@@ -53,18 +53,8 @@ def mazeGeneration():
         randomIndex = random.choice(range(0, len(wallList)))
         randomWall = wallList[randomIndex]
         if(randomWall):
-            
-
-
-
+            pass    
     
-
-    
-
-
-
-
-
     return maze
 
 
@@ -82,6 +72,7 @@ class maze(arcade.Window):
         # store sprites in list to referrence later
         self.wall_list = None
         self.items_list = None
+        self.camera = None
 
     def setup(self):
 
@@ -100,12 +91,20 @@ class maze(arcade.Window):
         self.player.center_x = 2
         self.player.center_y = 2
 
+        self.camera = arcade.Camera(self.width, self.height)
+
         #TODO: implement randomized maze algorithm (Dijkstras / Depth First Search)
         # Hardcoded right now to test maze wall creation
        
-        maze = mazeGeneration()
-
-
+        maze = [
+        [1, 0, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+        [1, 0, 1, 0, 1, 1, 1, 1, 0, 1],
+        [1, 0, 1, 0, 0, 0, 0, 1, 0, 1],
+        [1, 0, 1, 0, 1, 1, 0, 1, 1, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        ]
 
         for x in range(len(maze)):
             for y in range(len(maze[x])):
@@ -139,6 +138,7 @@ class maze(arcade.Window):
     def on_draw(self):
         self.clear()
         self.wall_list.draw()
+        self.camera.use()
         self.player.draw()   
 
 
@@ -167,6 +167,21 @@ class maze(arcade.Window):
     def on_update(self, delta_time):
         #prevent players from leaving path
         self.wall_collide.update()
+        self.center_camera_to_player()
+
+    def center_camera_to_player(self):
+        screen_center_x = self.player.center_x - (self.camera.viewport_width / 2)
+        screen_center_y = self.player.center_y - (
+            self.camera.viewport_height / 2
+        )
+
+        if screen_center_x < 0:
+            screen_center_x = 0
+        if screen_center_y < 0:
+            screen_center_y = 0
+        player_centered = screen_center_x, screen_center_y
+
+        self.camera.move_to(player_centered)
 
 
 def main():
