@@ -62,7 +62,7 @@ class maze(arcade.Window):
     def __init__(self):
 
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-        arcade.set_background_color(arcade.csscolor.MEDIUM_SEA_GREEN)
+        arcade.set_background_color(arcade.csscolor.BURLYWOOD)
 
         self.scene = None
         self.player = None
@@ -119,7 +119,7 @@ class maze(arcade.Window):
         for x in range(len(maze)):
             for y in range(len(maze[x])):
                 if maze[x][y] == 1:
-                    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", TILE_SCALING)
+                    wall = arcade.Sprite(":resources:images/topdown_tanks/tileGrass2.png", TILE_SCALING)
                     wall.position = (((x * 35) + 100), ((y * 35) + 100))    
                     self.wall_list.append(wall)
                     self.scene.add_sprite("Walls", wall)        
