@@ -77,6 +77,8 @@ class maze(arcade.Window):
         self.bg_music = arcade.Sound(":resources:music/funkyrobot.mp3", streaming=True)
         self.bg_music.play(volume=0.10, loop = True)
 
+
+
         
 
     def setup(self):
@@ -89,8 +91,11 @@ class maze(arcade.Window):
 
         #setup the player
         #TODO: change image source from arcade to user
-        image_source = ":resources:images/animated_characters/male_person/malePerson_idle.png"
-        self.player = arcade.Sprite(image_source, CHARACTER_SCALING)
+        player_idle = ":resources:images/animated_characters/male_person/malePerson_idle.png"
+        self.player = arcade.Sprite(player_idle, CHARACTER_SCALING)
+        
+
+
 
         #TODO use algorithm to find possible start and end point of maze
         self.player.center_x = 2
@@ -148,26 +153,47 @@ class maze(arcade.Window):
 
 
     def on_key_press(self, key, modifiers):
+        player_left = arcade.load_texture(":resources:images/animated_characters/male_person/malePerson_walk2.png", flipped_horizontally= True)
+        player_right = arcade.load_texture(":resources:images/animated_characters/male_person/malePerson_walk2.png")
+        player_down = arcade.load_texture(":resources:images/animated_characters/male_person/malePerson_walk0.png")
+        player_up = arcade.load_texture(":resources:images/animated_characters/male_person/malePerson_climb1.png")
 
         if key == arcade.key.UP or key == arcade.key.W:
             self.player.change_y = PLAYER_MOVEMENT_SPEED
+            self.player.texture = player_up
+
         elif key == arcade.key.DOWN or key == arcade.key.S:
             self.player.change_y = -PLAYER_MOVEMENT_SPEED
+            self.player.texture = player_down
+
         elif key == arcade.key.LEFT or key == arcade.key.A:
             self.player.change_x = -PLAYER_MOVEMENT_SPEED
+            self.player.texture = player_left
+
         elif key == arcade.key.RIGHT or key == arcade.key.D:
             self.player.change_x = PLAYER_MOVEMENT_SPEED
+            self.player.texture = player_right
+            
 
     def on_key_release(self, key, modifiers):
+        player_idle = arcade.load_texture(":resources:images/animated_characters/male_person/malePerson_idle.png")
 
         if key == arcade.key.UP or key == arcade.key.W:
             self.player.change_y = 0
+            self.player.texture = player_idle
+
         elif key == arcade.key.DOWN or key == arcade.key.S:
             self.player.change_y = 0
+            self.player.texture = player_idle
+            
         elif key == arcade.key.LEFT or key == arcade.key.A:
             self.player.change_x = 0
+            self.player.texture = player_idle
+            
         elif key == arcade.key.RIGHT or key == arcade.key.D:
             self.player.change_x = 0
+            self.player.texture = player_idle
+
 
     def on_update(self, delta_time):
         #prevent players from leaving path
