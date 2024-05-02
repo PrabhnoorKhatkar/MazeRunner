@@ -8,7 +8,6 @@ SCREEN_TITLE = "Maze Runner"
 CHARACTER_SCALING = 0.42
 TILE_SCALING = 0.22
 PLAYER_MOVEMENT_SPEED = 2.5
-#Peter wrote this
 
 
 
@@ -63,9 +62,9 @@ class maze(arcade.Window):
     def __init__(self):
 
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-        arcade.set_background_color(arcade.csscolor.GHOST_WHITE)
-        self.scene = None
+        arcade.set_background_color(arcade.csscolor.MEDIUM_SEA_GREEN)
 
+        self.scene = None
         self.player = None
         self.wall_collide = None
 
@@ -73,6 +72,12 @@ class maze(arcade.Window):
         self.wall_list = None
         self.items_list = None
         self.camera = None
+
+        #background music initialization + looping
+        self.bg_music = arcade.Sound(":resources:music/funkyrobot.mp3", streaming=True)
+        self.bg_music.play(volume=0.10, loop = True)
+
+        
 
     def setup(self):
 
@@ -84,7 +89,7 @@ class maze(arcade.Window):
 
         #setup the player
         #TODO: change image source from arcade to user
-        image_source = ":resources:images/items/coinSilver.png"
+        image_source = ":resources:images/animated_characters/male_person/malePerson_idle.png"
         self.player = arcade.Sprite(image_source, CHARACTER_SCALING)
 
         #TODO use algorithm to find possible start and end point of maze
@@ -168,6 +173,7 @@ class maze(arcade.Window):
         #prevent players from leaving path
         self.wall_collide.update()
         self.center_camera_to_player()
+
 
     def center_camera_to_player(self):
         screen_center_x = self.player.center_x - (self.camera.viewport_width / 2)
