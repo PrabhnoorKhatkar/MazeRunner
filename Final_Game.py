@@ -114,12 +114,10 @@ class maze(arcade.Window):
         #self.bg_music.play(volume=0.10, loop = True)
 
 
-
-        
-
     def setup(self):
 
         self.scene = arcade.Scene()
+        self.dark_circle_sprite = arcade.Sprite("dark_circle.png")
 
         #implementing sprites
         self.wall_list = arcade.SpriteList(use_spatial_hash=True)
@@ -163,12 +161,16 @@ class maze(arcade.Window):
         #TODO: create code logic to prevent players from finishing the game before collecting all items
 
         #TODO: implement borders on the map to prevent players from leaving
+        # how to do, like in safari drive make it where we stop input movement if sprite goes outside boundaries
 
         #TODO: implement camera view that reduces player visability (dark circle) 
+        #done 
+
 
     def on_draw(self):
         self.clear()
         self.wall_list.draw()
+        self.dark_circle_sprite.draw()
         self.camera.use()
         self.player.draw()   
 
@@ -217,6 +219,8 @@ class maze(arcade.Window):
 
 
     def on_update(self, delta_time):
+        self.dark_circle_sprite.center_x = self.player.center_x
+        self.dark_circle_sprite.center_y = self.player.center_y
         #prevent players from leaving path
         self.wall_collide.update()
         self.center_camera_to_player()
