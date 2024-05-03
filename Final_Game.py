@@ -9,53 +9,89 @@ CHARACTER_SCALING = 0.42
 TILE_SCALING = 0.22
 PLAYER_MOVEMENT_SPEED = 2.5
 
-
-
-def mazeGeneration():
-    '''
-    1.Start with a grid full of walls.
-    2. Pick a cell, mark it as part of the maze. Add the walls of the cell to the wall list.
-    3.While there are walls in the list:
-        1.Pick a random wall from the list. If only one of the cells that the wall divides is visited, then:
-            1.Make the wall a passage and mark the unvisited cell as part of the maze.
-            2.Add the neighboring walls of the cell to the wall list.
-        2.Remove the wall from the list.
-    '''
-    #1
-            # do this  for this collection   for this collection
-    maze = [[1 for x in range(0,25)] for x in range(0,25)]
-    #2
-    x = random.choice(range(1,24))
-    y = random.choice(range(1,24))
-    maze[x,y] = 0
-    wallList = []
-    if(maze[x-1, y] == 1):
-        wallList.append((x-1,y))
-    if(maze[x+1, y] == 1):
-        wallList.append((x+1,y))
-    if(maze[x, y-1] == 1):
-        wallList.append((x,y-1))
-    if(maze[x, y+1] == 1):
-        wallList.append((x,y+1))
-
-    '''
-    1.Start with a grid full of walls.
-    2. Pick a cell, mark it as part of the maze. Add the walls of the cell to the wall list.
-    3.While there are walls in the list:
-        1.Pick a random wall from the list. If only one of the cells that the wall divides is visited, then:
-            1.Make the wall a passage and mark the unvisited cell as part of the maze.
-            2.Add the neighboring walls of the cell to the wall list.
-        2.Remove the wall from the list.
-    '''
-    #3
-    while(wallList.isEmpty()):
-        randomIndex = random.choice(range(0, len(wallList)))
-        randomWall = wallList[randomIndex]
-        if(randomWall):
-            pass    
+def mazeGeneration(width, height):
+    # Psuedocode from DFS iterative wikipedia maze generation TODO add link
+    '''1. Choose the initial cell, mark it as visited and push it to the stack
+       2.While the stack is not empty
+            1.Pop a cell from the stack and make it a current cell
+            2.If the current cell has any neighbours which have not been visited
+                1.Push the current cell to the stack
+                2.Choose one of the unvisited neighbours
+                3.Remove the wall between the current cell and the chosen cell
+                4.Mark the chosen cell as visited and push it to the stack'''
     
+    maze = [[1 for x in range(width)] for y in range(height)]  
+
+    # Random Starting Position (has to be border cells)
+    # 1 Choose the initial cell, mark it as visited and push it to the stack
+    rndRow = random.randrange(0,height)
+    rndCol = random.randrange(0,width)
+
+    stack = []
+    visited = []
+
+    maze[rndRow][rndCol] = 0  
+    stack.append((rndRow, rndCol)) 
+    visited.append((rndRow, rndCol))
+    
+    # 2. While the stack is not empty
+    while stack:
+        #1.1 Pop a cell from the stack and make it a current cell
+        currCell = stack.pop()  
+        #1.2.2 & 1.2 Choose one of the unvisited neighbours
+        neighbor = choose_neighbor(currCell, width, height, visited)
+
+        #2.2  If the current cell has any neighbours which have not been visited
+        if neighbor is not None:
+            #1.2.1 Push the current cell to the stack
+            stack.append(currCell) 
+            maze[currCell[0]][currCell[1]] = 0  
+            #1.2.3 Remove the wall between the current cell and the chosen cell
+            maze[(currCell[0] + neighbor[0]) // 2][(currCell[1] + neighbor[1]) // 2] = 0  
+            #1.2.4 Mark the chosen cell as visited and push it to the stack'''
+            stack.append(neighbor)  
+            visited.append(neighbor) 
+
+    # Add border walls
+    for i in range(height):
+        maze[i][0] = maze[i][-1] = 1
+    for j in range(width):
+        maze[0][j] = maze[-1][j] = 1
+
+
     return maze
 
+def choose_neighbor(cell, width, height, visited):
+    directions = [(-1, 0), (1, 0), (0, 1), (0, -1)]  # left, right, up, down
+    random.shuffle(directions)
+
+    for direction in directions:
+        neighbor = (cell[0] + direction[0]*2, cell[1] + direction[1]*2)
+        wall = (cell[0] + direction[0], cell[1] + direction[1])
+        if 0 <= neighbor[0] < height and 0 <= neighbor[1] < width and neighbor not in visited:
+            return neighbor
+    return None
+
+def isSolvable(maze):
+    '''Check if maze is solvable also return a stack of all dead ends'''
+    width = (maze[0].length)
+    height = (maze.length)
+    # Random Starting Position (has to be inside maze)
+    # 1 Choose the initial cell, mark it as visited and push it to the stack
+    startRow = random.randrange(1,height-1)
+    startCol = random.randrange(1,width-1)
+
+
+    stack = []
+    visited = []
+    stack.append((startRow, startCol)) 
+    visited.append((startRow, startCol))
+
+    while(stack):
+        pass
+
+
+    
 
 class maze(arcade.Window):
  
@@ -74,8 +110,8 @@ class maze(arcade.Window):
         self.camera = None
 
         #background music initialization + looping
-        self.bg_music = arcade.Sound(":resources:music/funkyrobot.mp3", streaming=True)
-        self.bg_music.play(volume=0.10, loop = True)
+        #self.bg_music = arcade.Sound(":resources:music/funkyrobot.mp3", streaming=True)
+        #self.bg_music.play(volume=0.10, loop = True)
 
 
 
@@ -106,15 +142,8 @@ class maze(arcade.Window):
         #TODO: implement randomized maze algorithm (Dijkstras / Depth First Search)
         # Hardcoded right now to test maze wall creation
        
-        maze = [
-        [1, 0, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-        [1, 0, 1, 0, 1, 1, 1, 1, 0, 1],
-        [1, 0, 1, 0, 0, 0, 0, 1, 0, 1],
-        [1, 0, 1, 0, 1, 1, 0, 1, 1, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-        ]
+        maze = mazeGeneration(50,50)
+        print(maze)
 
         for x in range(len(maze)):
             for y in range(len(maze[x])):
@@ -124,20 +153,12 @@ class maze(arcade.Window):
                     self.wall_list.append(wall)
                     self.scene.add_sprite("Walls", wall)        
 
-        '''
-        #use this for loop to generate the locations of boxes
-        coordinate_list = [[10, 20], [30, 96]]
-        for coordinate in coordinate_list:
-            wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", TILE_SCALING)
-            wall.position = coordinate
-            self.wall_list.append(wall)
-            self.scene.add_sprite("Walls", wall)
-        '''
 
         #physics engine for walls (collide)
         self.wall_collide = arcade.PhysicsEngineSimple(self.player, self.scene.get_sprite_list("Walls"))
         
         #TODO: set up items and implement them on open spaces using algorithm
+
 
         #TODO: create code logic to prevent players from finishing the game before collecting all items
 
