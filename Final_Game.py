@@ -129,8 +129,6 @@ class maze(arcade.Window):
         self.player = arcade.Sprite(player_idle, CHARACTER_SCALING)
         
         #TODO use algorithm to find possible start and end point of maze
-        self.player.center_x = 309
-        self.player.center_y = 503
         self.camera = arcade.Camera(self.width, self.height)
 
         #TODO: implement randomized maze algorithm (Dijkstras / Depth First Search)
