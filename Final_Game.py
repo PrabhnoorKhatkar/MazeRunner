@@ -10,6 +10,13 @@ TILE_SCALING = 0.45
 COIN_SCALING = 0.30
 PLAYER_MOVEMENT_SPEED = 2.5
 
+
+def populateMaze(width, height):
+    maze = [[random.randint(0, 1) for x in range(width)] for y in range(height)]  
+
+    return maze
+
+
 def mazeGeneration(width, height):
     # Psuedocode from DFS iterative wikipedia maze generation TODO add link
     '''1. Choose the initial cell, mark it as visited and push it to the stack
@@ -21,7 +28,8 @@ def mazeGeneration(width, height):
                 3.Remove the wall between the current cell and the chosen cell
                 4.Mark the chosen cell as visited and push it to the stack'''
     
-    maze = [[1 for x in range(width)] for y in range(height)]  
+    maze = populateMaze(width, height)
+
 
     # Random Starting Position (has to be border cells)
     # 1 Choose the initial cell, mark it as visited and push it to the stack
@@ -167,7 +175,7 @@ class maze(arcade.Window):
         self.clear()
         self.wall_list.draw()
         self.items_list.draw()
-        self.dark_circle_sprite.draw()
+        #self.dark_circle_sprite.draw()
         self.camera.use()
         self.player.draw()  
         self.center_camera_to_player()
