@@ -6,7 +6,8 @@ SCREEN_HEIGHT = 700
 SCREEN_TITLE = "Maze Runner"
 
 CHARACTER_SCALING = 0.42
-TILE_SCALING = 0.22
+TILE_SCALING = 0.45
+COIN_SCALING = 0.30
 PLAYER_MOVEMENT_SPEED = 2.5
 
 def mazeGeneration(width, height):
@@ -58,7 +59,6 @@ def mazeGeneration(width, height):
     for j in range(width):
         maze[0][j] = maze[-1][j] = 1
 
-
     return maze
 
 def choose_neighbor(cell, width, height, visited):
@@ -91,8 +91,6 @@ def isSolvable(maze):
         pass
 
 
-    
-
 class maze(arcade.Window):
  
     def __init__(self):
@@ -108,8 +106,10 @@ class maze(arcade.Window):
         self.wall_list = None
         self.items_list = None
         self.camera = None
+        self.score = 0
 
         #background music initialization + looping
+        #Commented out because unreliable on MacOS and dependenices are installed but still gives issues 
         #self.bg_music = arcade.Sound(":resources:music/funkyrobot.mp3", streaming=True)
         #self.bg_music.play(volume=0.10, loop = True)
 
@@ -128,52 +128,80 @@ class maze(arcade.Window):
         player_idle = ":resources:images/animated_characters/male_person/malePerson_idle.png"
         self.player = arcade.Sprite(player_idle, CHARACTER_SCALING)
         
-
-
-
         #TODO use algorithm to find possible start and end point of maze
-        self.player.center_x = 2
-        self.player.center_y = 2
-
+        self.player.center_x = 309
+        self.player.center_y = 503
         self.camera = arcade.Camera(self.width, self.height)
 
         #TODO: implement randomized maze algorithm (Dijkstras / Depth First Search)
-        # Hardcoded right now to test maze wall creation
-       
-        maze = mazeGeneration(50,50)
-        print(maze)
+        maze = mazeGeneration(22,22)
 
+        emptySpace = []
         for x in range(len(maze)):
-            for y in range(len(maze[x])):
+            for y in range(len(maze[x])): 
                 if maze[x][y] == 1:
                     wall = arcade.Sprite(":resources:images/topdown_tanks/tileGrass2.png", TILE_SCALING)
                     wall.position = (((x * 35) + 100), ((y * 35) + 100))    
                     self.wall_list.append(wall)
-                    self.scene.add_sprite("Walls", wall)        
+                    self.scene.add_sprite("Walls", wall)  
+                elif maze[x][y] == 0:
+                    emptySpace.append((x,y))
 
+        random.shuffle(emptySpace)
+        coinList = emptySpace[0:4]
+        self.player.center_x = ((coinList[-1][0] * 35) + 100)
+        self.player.center_y = ((coinList[-1][1] * 35) + 100)  
+        coinList = coinList[0:3]
+
+
+        
+        for x,y in coinList:
+            coin = arcade.Sprite(":resources:images/items/coinGold.png", COIN_SCALING)
+            coin.position = (((x * 35) + 100), ((y * 35) + 100))  
+            self.items_list.append(coin)
+            self.scene.add_sprite("Coins", coin)
+                    
 
         #physics engine for walls (collide)
         self.wall_collide = arcade.PhysicsEngineSimple(self.player, self.scene.get_sprite_list("Walls"))
         
-        #TODO: set up items and implement them on open spaces using algorithm
-
-
-        #TODO: create code logic to prevent players from finishing the game before collecting all items
-
-        #TODO: implement borders on the map to prevent players from leaving
-        # how to do, like in safari drive make it where we stop input movement if sprite goes outside boundaries
-
-        #TODO: implement camera view that reduces player visability (dark circle) 
-        #done 
-
-
     def on_draw(self):
         self.clear()
         self.wall_list.draw()
+        self.items_list.draw()
         self.dark_circle_sprite.draw()
         self.camera.use()
-        self.player.draw()   
+        self.player.draw()  
+        self.center_camera_to_player()
+       
+        
 
+    def on_update(self, delta_time):
+        self.dark_circle_sprite.center_x = self.player.center_x
+        self.dark_circle_sprite.center_y = self.player.center_y
+        
+        #prevent players from leaving path
+        self.wall_collide.update()
+        self.center_camera_to_player()
+        coin_touch = arcade.check_for_collision_with_list(self.player,self.items_list)
+
+        for coin in coin_touch:
+            coin.remove_from_sprite_lists()
+            self.score += 1
+
+    def center_camera_to_player(self):
+        screen_center_x = self.player.center_x - (self.camera.viewport_width / 2)
+        screen_center_y = self.player.center_y - (self.camera.viewport_height / 2)
+
+        if screen_center_x < 0:
+            screen_center_x = 0
+        if screen_center_y < 0:
+            screen_center_y = 0
+        player_centered = screen_center_x, screen_center_y
+
+        self.camera.move_to(player_centered)
+
+        arcade.draw_text(f"Score: {self.score}", start_x=screen_center_x + 820, start_y=screen_center_y + 630, color=arcade.color.WHITE, font_size=20)
 
     def on_key_press(self, key, modifiers):
         player_left = arcade.load_texture(":resources:images/animated_characters/male_person/malePerson_walk2.png", flipped_horizontally= True)
@@ -216,30 +244,6 @@ class maze(arcade.Window):
         elif key == arcade.key.RIGHT or key == arcade.key.D:
             self.player.change_x = 0
             self.player.texture = player_idle
-
-
-    def on_update(self, delta_time):
-        self.dark_circle_sprite.center_x = self.player.center_x
-        self.dark_circle_sprite.center_y = self.player.center_y
-        #prevent players from leaving path
-        self.wall_collide.update()
-        self.center_camera_to_player()
-
-
-    def center_camera_to_player(self):
-        screen_center_x = self.player.center_x - (self.camera.viewport_width / 2)
-        screen_center_y = self.player.center_y - (
-            self.camera.viewport_height / 2
-        )
-
-        if screen_center_x < 0:
-            screen_center_x = 0
-        if screen_center_y < 0:
-            screen_center_y = 0
-        player_centered = screen_center_x, screen_center_y
-
-        self.camera.move_to(player_centered)
-
 
 def main():
     window = maze()
