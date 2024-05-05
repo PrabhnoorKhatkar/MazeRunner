@@ -5,10 +5,10 @@ SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 700
 SCREEN_TITLE = "Maze Runner"
 
-CHARACTER_SCALING = 0.42
+CHARACTER_SCALING = 0.35
 TILE_SCALING = 0.45
 COIN_SCALING = 0.30
-PLAYER_MOVEMENT_SPEED = 2.5
+PLAYER_MOVEMENT_SPEED = 7.5
 
 
 def populateMaze(width, height):
@@ -37,8 +37,7 @@ def mazeGeneration(width, height):
     maze = populateMaze(width, height)
 
 
-    # Random Starting Position (has to be border cells)
-    # 1 Choose the initial cell, mark it as visited and push it to the stack
+    # Choose the initial cell, mark it as visited and push it to the stack
     rndRow = random.randrange(0,height)
     rndCol = random.randrange(0,width)
 
@@ -52,21 +51,18 @@ def mazeGeneration(width, height):
     stack.append((rndRow, rndCol)) 
     visited.append((rndRow, rndCol))
     
-    # 2. While the stack is not empty
+    # While the stack is not empty
     while stack:
-        #1.1 Pop a cell from the stack and make it a current cell
         currCell = stack.pop()  
-        #1.2.2 & 1.2 Choose one of the unvisited neighbours
         neighbor = choose_neighbor(currCell, width, height, visited)
 
-        #2.2  If the current cell has any neighbours which have not been visited
+        # If the current cell has any neighbours which have not been visited
         if neighbor is not None:
-            #1.2.1 Push the current cell to the stack
             stack.append(currCell) 
             maze[currCell[0]][currCell[1]] = 0  
+
             #1.2.3 Remove the wall between the current cell and the chosen cell
             maze[(currCell[0] + neighbor[0]) // 2][(currCell[1] + neighbor[1]) // 2] = 0  
-            #1.2.4 Mark the chosen cell as visited and push it to the stack'''
             stack.append(neighbor)  
             visited.append(neighbor) 
 
@@ -88,24 +84,6 @@ def choose_neighbor(cell, width, height, visited):
         if 0 <= neighbor[0] < height and 0 <= neighbor[1] < width and neighbor not in visited:
             return neighbor
     return None
-
-def isSolvable(maze):
-    '''Check if maze is solvable also return a stack of all dead ends'''
-    width = (maze[0].length)
-    height = (maze.length)
-    # Random Starting Position (has to be inside maze)
-    # 1 Choose the initial cell, mark it as visited and push it to the stack
-    startRow = random.randrange(1,height-1)
-    startCol = random.randrange(1,width-1)
-
-
-    stack = []
-    visited = []
-    stack.append((startRow, startCol)) 
-    visited.append((startRow, startCol))
-
-    while(stack):
-        pass
 
 
 class maze(arcade.Window):
@@ -140,15 +118,11 @@ class maze(arcade.Window):
         self.wall_list = arcade.SpriteList(use_spatial_hash=True)
         self.items_list = arcade.SpriteList(use_spatial_hash=True)
 
-        #setup the player
-        #TODO: change image source from arcade to user
         player_idle = ":resources:images/animated_characters/male_person/malePerson_idle.png"
         self.player = arcade.Sprite(player_idle, CHARACTER_SCALING)
         
-        #TODO use algorithm to find possible start and end point of maze
         self.camera = arcade.Camera(self.width, self.height)
 
-        #TODO: implement randomized maze algorithm (Dijkstras / Depth First Search)
         maze = mazeGeneration(25,25)
 
         emptySpace = []
@@ -167,8 +141,6 @@ class maze(arcade.Window):
         self.player.center_x = ((coinList[-1][0] * 35) + 100)
         self.player.center_y = ((coinList[-1][1] * 35) + 100)  
         coinList = coinList[0:3]
-
-
         
         for x,y in coinList:
             coin = arcade.Sprite(":resources:images/items/coinGold.png", COIN_SCALING)
@@ -204,7 +176,7 @@ class maze(arcade.Window):
             coin.remove_from_sprite_lists()
             self.score += 1
         
-        if self.score == 1:
+        if self.score == 3:
             self.center_camera_to_player()
 
 
@@ -221,7 +193,7 @@ class maze(arcade.Window):
         self.camera.move_to(player_centered)
 
         arcade.draw_text(f"Score: {self.score}", start_x=screen_center_x + 820, start_y=screen_center_y + 630, color=arcade.color.WHITE, font_size=20)
-        if self.score == 1:
+        if self.score == 3:
             arcade.draw_text(f"You Win!" , start_x=screen_center_x + 440, start_y=screen_center_y + 550, color=arcade.color.BLUE, font_size=20)
 
     def on_key_press(self, key, modifiers):
