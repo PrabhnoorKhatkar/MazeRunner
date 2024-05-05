@@ -11,17 +11,6 @@ COIN_SCALING = 0.30
 PLAYER_MOVEMENT_SPEED = 7.5
 
 
-def populateMaze(width, height):
-    '''Make a chessboard like maze for maze algo'''
-    maze = [[1 for y in range(height)]  for x in range(width)]  
-    for x in range(width):
-        for y in range(height):
-            if(x % 2 == 0 and y % 2 == 1): #if row = even, col = odd
-                maze[x][y] = 0
-
-    return maze
-
-
 def mazeGeneration(width, height):
     # Psuedocode from DFS iterative wikipedia maze generation TODO add link
     '''1. Choose the initial cell, mark it as visited and push it to the stack
@@ -33,18 +22,14 @@ def mazeGeneration(width, height):
                 3.Remove the wall between the current cell and the chosen cell
                 4.Mark the chosen cell as visited and push it to the stack'''
     
-    maze = populateMaze(width, height)
-
-
-    # Choose the initial cell, mark it as visited and push it to the stack
-    rndRow = random.randrange(0,height)
-    rndCol = random.randrange(0,width)
+    # Fill Maze with all 1's
+    maze = [[1 for y in range(width)]  for x in range(height)]  
 
     stack = []
     visited = []
-    while(maze[rndRow][rndCol] == 1):
-        rndRow = random.randrange(0,height)
-        rndCol = random.randrange(0,width)
+
+    rndRow = random.randrange(0,height)
+    rndCol = random.randrange(0,width)
 
     maze[rndRow][rndCol] = 0  
     stack.append((rndRow, rndCol)) 
