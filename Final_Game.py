@@ -13,7 +13,6 @@ PLAYER_MOVEMENT_SPEED = 7.5
 
 def populateMaze(width, height):
     '''Make a chessboard like maze for maze algo'''
-    maze = []
     maze = [[1 for y in range(height)]  for x in range(width)]  
     for x in range(width):
         for y in range(height):
@@ -54,7 +53,7 @@ def mazeGeneration(width, height):
     # While the stack is not empty
     while stack:
         currCell = stack.pop()  
-        neighbor = choose_neighbor(currCell, width, height, visited)
+        neighbor = choose_neighbor(currCell, width, height, visited, maze)
 
         # If the current cell has any neighbours which have not been visited
         if neighbor is not None:
@@ -74,15 +73,18 @@ def mazeGeneration(width, height):
 
     return maze
 
-def choose_neighbor(cell, width, height, visited):
+def choose_neighbor(cell, width, height, visited, maze):
     directions = [(-1, 0), (1, 0), (0, 1), (0, -1)]  # left, right, up, down
     random.shuffle(directions)
 
     for direction in directions:
-        neighbor = (cell[0] + direction[0]*2, cell[1] + direction[1]*2)
-        wall = (cell[0] + direction[0], cell[1] + direction[1])
-        if 0 <= neighbor[0] < height and 0 <= neighbor[1] < width and neighbor not in visited:
-            return neighbor
+        farNeighbor = (cell[0] + direction[0]*2, cell[1] + direction[1]*2)
+        nearNeighbor = (cell[0] + direction[0], cell[1] + direction[1])
+        if 1 <= farNeighbor[0] < height-1 and 1 <= farNeighbor[1] < width-1 and farNeighbor not in visited:
+            return farNeighbor
+        
+        if not farNeighbor:
+            maze[nearNeighbor[0]][nearNeighbor[1]] = 0 # Break the wall edge case (prevents nonconnected paths)
     return None
 
 
