@@ -12,7 +12,13 @@ PLAYER_MOVEMENT_SPEED = 2.5
 
 
 def populateMaze(width, height):
-    maze = [[random.randint(0, 1) for x in range(width)] for y in range(height)]  
+    '''Make a chessboard like maze for maze algo'''
+    maze = []
+    maze = [[1 for y in range(height)]  for x in range(width)]  
+    for x in range(width):
+        for y in range(height):
+            if(x % 2 == 0 and y % 2 == 1): #if row = even, col = odd
+                maze[x][y] = 0
 
     return maze
 
@@ -38,6 +44,9 @@ def mazeGeneration(width, height):
 
     stack = []
     visited = []
+    while(maze[rndRow][rndCol] == 1):
+        rndRow = random.randrange(0,height)
+        rndCol = random.randrange(0,width)
 
     maze[rndRow][rndCol] = 0  
     stack.append((rndRow, rndCol)) 
@@ -140,7 +149,7 @@ class maze(arcade.Window):
         self.camera = arcade.Camera(self.width, self.height)
 
         #TODO: implement randomized maze algorithm (Dijkstras / Depth First Search)
-        maze = mazeGeneration(22,22)
+        maze = mazeGeneration(25,25)
 
         emptySpace = []
         for x in range(len(maze)):
@@ -194,6 +203,10 @@ class maze(arcade.Window):
         for coin in coin_touch:
             coin.remove_from_sprite_lists()
             self.score += 1
+        
+        if self.score == 1:
+            self.center_camera_to_player()
+
 
     def center_camera_to_player(self):
         screen_center_x = self.player.center_x - (self.camera.viewport_width / 2)
@@ -208,6 +221,8 @@ class maze(arcade.Window):
         self.camera.move_to(player_centered)
 
         arcade.draw_text(f"Score: {self.score}", start_x=screen_center_x + 820, start_y=screen_center_y + 630, color=arcade.color.WHITE, font_size=20)
+        if self.score == 1:
+            arcade.draw_text(f"You Win!" , start_x=screen_center_x + 440, start_y=screen_center_y + 550, color=arcade.color.BLUE, font_size=20)
 
     def on_key_press(self, key, modifiers):
         player_left = arcade.load_texture(":resources:images/animated_characters/male_person/malePerson_walk2.png", flipped_horizontally= True)
