@@ -41,7 +41,7 @@ def mazeGeneration(width, height):
             stack.append(currCell) 
             maze[currCell[0]][currCell[1]] = 0  
 
-            # Remove the wall between the current cell and the chosen cell
+            # Remove the wall at location of neighbor
             maze[(currCell[0] + neighbor[0]) // 2][(currCell[1] + neighbor[1]) // 2] = 0  
             stack.append(neighbor)  
             visited.append(neighbor) 
@@ -59,7 +59,7 @@ def mazeGeneration(width, height):
     return maze
 
 def choose_neighbor(cell, width, height, visited, maze):
-    '''Return the valid direction in which the maze will conitune in (NESW)'''
+    '''Return the valid direction in which the maze will continue in (NESW)'''
     directions = [(-1, 0), (1, 0), (0, 1), (0, -1)]  # left, right, up, down
     random.shuffle(directions)
 
@@ -67,7 +67,7 @@ def choose_neighbor(cell, width, height, visited, maze):
         farNeighbor = (cell[0] + direction[0]*2, cell[1] + direction[1]*2)
         nearNeighbor = (cell[0] + direction[0], cell[1] + direction[1])
         if 1 <= farNeighbor[0] < width-1 and 1 <= farNeighbor[1] < height-1: #If possible x & y directions inside borders 
-            if farNeighbor not in visited: # Within scopes
+            if farNeighbor not in visited: # if far neighbor is new possible path return neighbor
                 return farNeighbor
         
         if not farNeighbor:
@@ -115,6 +115,7 @@ class maze(arcade.Window):
         maze = mazeGeneration(MAZE_SIZE,MAZE_SIZE)
 
         # Get all 0s empty spaces in the maze
+        # Add walls in places where 1s exist
         emptySpace = []
         for x in range(len(maze)):
             for y in range(len(maze[x])): 
@@ -161,7 +162,6 @@ class maze(arcade.Window):
         self.dark_circle_sprite.center_x = self.player.center_x
         self.dark_circle_sprite.center_y = self.player.center_y
         
-        # Prevent players from leaving path
         self.wall_collide.update()
         self.center_camera_to_player()
         coin_touch = arcade.check_for_collision_with_list(self.player,self.items_list)
