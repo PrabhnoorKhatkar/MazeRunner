@@ -8,11 +8,15 @@ SCREEN_TITLE = "Maze Runner"
 CHARACTER_SCALING = 0.35
 TILE_SCALING = 0.45
 COIN_SCALING = 0.30
-PLAYER_MOVEMENT_SPEED = 7.5
+PLAYER_MOVEMENT_SPEED = 4.2
+POS_SCALE = 35
+POS_OFFSET = 100
+NUM_OF_COINS = 3
+MAZE_SIZE = 25
 
 
 def mazeGeneration(width, height):
-    # Psuedocode from DFS iterative wikipedia maze generation TODO add link
+    # Psuedocode from DFS iterative wikipedia maze generation 
     '''1. Choose the initial cell, mark it as visited and push it to the stack
        2.While the stack is not empty
             1.Pop a cell from the stack and make it a current cell
@@ -51,21 +55,27 @@ def mazeGeneration(width, height):
             visited.append(neighbor) 
 
     # Add border walls
-    for i in range(height):
-        maze[i][0] = maze[i][-1] = 1
+    # Vertical Wall
     for j in range(width):
-        maze[0][j] = maze[-1][j] = 1
+        maze[0][j] = 1
+        maze[-1][j] = 1
+    # Horizontal Wall
+    for i in range(height):
+        maze[i][0] = 1
+        maze[i][-1] = 1
+ 
 
     return maze
 
 def choose_neighbor(cell, width, height, visited, maze):
+    '''Return the valid direction in which the maze will conitune in (NESW)'''
     directions = [(-1, 0), (1, 0), (0, 1), (0, -1)]  # left, right, up, down
     random.shuffle(directions)
 
     for direction in directions:
         farNeighbor = (cell[0] + direction[0]*2, cell[1] + direction[1]*2)
         nearNeighbor = (cell[0] + direction[0], cell[1] + direction[1])
-        if 1 <= farNeighbor[0] < height-1 and 1 <= farNeighbor[1] < width-1 and farNeighbor not in visited:
+        if 1 <= farNeighbor[0] < height-1 and 1 <= farNeighbor[1] < width-1 and farNeighbor not in visited: # Within scopes
             return farNeighbor
         
         if not farNeighbor:
@@ -110,28 +120,31 @@ class maze(arcade.Window):
         
         self.camera = arcade.Camera(self.width, self.height)
 
-        maze = mazeGeneration(25,25)
+        maze = mazeGeneration(MAZE_SIZE,MAZE_SIZE)
 
+        # Get all 0s empty spaces in the maze
         emptySpace = []
         for x in range(len(maze)):
             for y in range(len(maze[x])): 
                 if maze[x][y] == 1:
                     wall = arcade.Sprite(":resources:images/topdown_tanks/tileGrass2.png", TILE_SCALING)
-                    wall.position = (((x * 35) + 100), ((y * 35) + 100))    
+                    wall.position = (((x * POS_SCALE) + POS_OFFSET), ((y * POS_SCALE) + POS_OFFSET))  
                     self.wall_list.append(wall)
                     self.scene.add_sprite("Walls", wall)  
                 elif maze[x][y] == 0:
                     emptySpace.append((x,y))
 
+        # Starting position of player in maze
         random.shuffle(emptySpace)
-        coinList = emptySpace[0:4]
-        self.player.center_x = ((coinList[-1][0] * 35) + 100)
-        self.player.center_y = ((coinList[-1][1] * 35) + 100)  
-        coinList = coinList[0:3]
+        coinList = emptySpace[0:NUM_OF_COINS+1]
+        self.player.center_x = ((coinList[-1][0] * POS_SCALE) + POS_OFFSET)
+        self.player.center_y = ((coinList[-1][1] * POS_SCALE) + POS_OFFSET)  
+        coinList = coinList[0:NUM_OF_COINS]
         
+        # Add coins to game collider
         for x,y in coinList:
             coin = arcade.Sprite(":resources:images/items/coinGold.png", COIN_SCALING)
-            coin.position = (((x * 35) + 100), ((y * 35) + 100))  
+            coin.position = (((x * POS_SCALE) + POS_OFFSET), ((y * POS_SCALE) + POS_OFFSET))  
             self.items_list.append(coin)
             self.scene.add_sprite("Coins", coin)
                     
@@ -139,11 +152,13 @@ class maze(arcade.Window):
         #physics engine for walls (collide)
         self.wall_collide = arcade.PhysicsEngineSimple(self.player, self.scene.get_sprite_list("Walls"))
         
+    
     def on_draw(self):
+        '''Draw components onto canvas to make visible'''
         self.clear()
         self.wall_list.draw()
         self.items_list.draw()
-        #self.dark_circle_sprite.draw()
+        self.dark_circle_sprite.draw()
         self.camera.use()
         self.player.draw()  
         self.center_camera_to_player()
@@ -151,6 +166,7 @@ class maze(arcade.Window):
         
 
     def on_update(self, delta_time):
+        '''Any component that triggers or is triggered during runtime'''
         self.dark_circle_sprite.center_x = self.player.center_x
         self.dark_circle_sprite.center_y = self.player.center_y
         
@@ -159,11 +175,13 @@ class maze(arcade.Window):
         self.center_camera_to_player()
         coin_touch = arcade.check_for_collision_with_list(self.player,self.items_list)
 
+        # Remove coin once player collects it
         for coin in coin_touch:
             coin.remove_from_sprite_lists()
             self.score += 1
-        
-        if self.score == 3:
+
+        # Win condition
+        if self.score == NUM_OF_COINS:
             self.center_camera_to_player()
 
 
@@ -171,16 +189,12 @@ class maze(arcade.Window):
         screen_center_x = self.player.center_x - (self.camera.viewport_width / 2)
         screen_center_y = self.player.center_y - (self.camera.viewport_height / 2)
 
-        if screen_center_x < 0:
-            screen_center_x = 0
-        if screen_center_y < 0:
-            screen_center_y = 0
         player_centered = screen_center_x, screen_center_y
 
         self.camera.move_to(player_centered)
 
         arcade.draw_text(f"Score: {self.score}", start_x=screen_center_x + 820, start_y=screen_center_y + 630, color=arcade.color.WHITE, font_size=20)
-        if self.score == 3:
+        if self.score == NUM_OF_COINS:
             arcade.draw_text(f"You Win!" , start_x=screen_center_x + 440, start_y=screen_center_y + 550, color=arcade.color.BLUE, font_size=20)
 
     def on_key_press(self, key, modifiers):
