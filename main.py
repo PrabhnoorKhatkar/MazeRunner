@@ -8,7 +8,7 @@ SCREEN_TITLE = "Maze Runner"
 CHARACTER_SCALING = 0.35
 TILE_SCALING = 0.45
 COIN_SCALING = 0.30
-PLAYER_MOVEMENT_SPEED = 4.2
+PLAYER_MOVEMENT_SPEED = 4.5
 POS_SCALE = 35
 POS_OFFSET = 100
 NUM_OF_COINS = 3
@@ -17,16 +17,7 @@ MAZE_SIZE = 25
 
 
 def mazeGeneration(width, height):
-    # Psuedocode from DFS iterative wikipedia maze generation 
-    '''1. Choose the initial cell, mark it as visited and push it to the stack
-       2.While the stack is not empty
-            1.Pop a cell from the stack and make it a current cell
-            2.If the current cell has any neighbours which have not been visited
-                1.Push the current cell to the stack
-                2.Choose one of the unvisited neighbours
-                3.Remove the wall between the current cell and the chosen cell
-                4.Mark the chosen cell as visited and push it to the stack'''
-    
+    '''Generate a maze 1=walls AND 0=paths'''
     # Fill Maze with all 1's
     maze = [[1 for y in range(width)]  for x in range(height)]  
 
@@ -56,15 +47,15 @@ def mazeGeneration(width, height):
             visited.append(neighbor) 
 
     # Add border walls
-    # Vertical Wall
-    for j in range(width):
-        maze[0][j] = 1
-        maze[-1][j] = 1
     # Horizontal Wall
-    for i in range(height):
-        maze[i][0] = 1
-        maze[i][-1] = 1
- 
+    for x in range(width):
+        maze[x][0] = 1
+        maze[x][-1] = 1
+    # Vertical Wall
+    for y in range(height):
+        maze[0][y] = 1
+        maze[-1][y] = 1
+
     return maze
 
 def choose_neighbor(cell, width, height, visited, maze):
