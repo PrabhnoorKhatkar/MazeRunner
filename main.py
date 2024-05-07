@@ -101,7 +101,7 @@ class maze(arcade.Window):
     def setup(self):
 
         self.scene = arcade.Scene()
-        self.dark_circle_sprite = arcade.Sprite("dark_circle.png")
+        self.dark_circle_sprite = arcade.Sprite("assets/dark_circle.png")
 
         # Initialize Sprites
         self.wall_list = arcade.SpriteList(use_spatial_hash=True)
@@ -149,7 +149,7 @@ class maze(arcade.Window):
         self.clear()
         self.wall_list.draw()
         self.items_list.draw()
-        #self.dark_circle_sprite.draw()
+        self.dark_circle_sprite.draw()
         self.camera.use()
         self.player.draw()  
         self.center_camera_to_player()
