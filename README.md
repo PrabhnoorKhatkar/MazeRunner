@@ -11,7 +11,7 @@ Collect all the coins to win
 Python version 3.11.5
 
 Instructions on how to execute game:
-1. CD into file path that stores main.py and dark_circle.png
+1. CD into file path that stores main.py
 2. run python3 main.py
 
 
