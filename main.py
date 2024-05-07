@@ -15,6 +15,7 @@ NUM_OF_COINS = 3
 MAZE_SIZE = 25
 
 
+
 def mazeGeneration(width, height):
     # Psuedocode from DFS iterative wikipedia maze generation 
     '''1. Choose the initial cell, mark it as visited and push it to the stack
@@ -49,7 +50,7 @@ def mazeGeneration(width, height):
             stack.append(currCell) 
             maze[currCell[0]][currCell[1]] = 0  
 
-            #1.2.3 Remove the wall between the current cell and the chosen cell
+            # Remove the wall between the current cell and the chosen cell
             maze[(currCell[0] + neighbor[0]) // 2][(currCell[1] + neighbor[1]) // 2] = 0  
             stack.append(neighbor)  
             visited.append(neighbor) 
@@ -64,7 +65,6 @@ def mazeGeneration(width, height):
         maze[i][0] = 1
         maze[i][-1] = 1
  
-
     return maze
 
 def choose_neighbor(cell, width, height, visited, maze):
@@ -75,8 +75,9 @@ def choose_neighbor(cell, width, height, visited, maze):
     for direction in directions:
         farNeighbor = (cell[0] + direction[0]*2, cell[1] + direction[1]*2)
         nearNeighbor = (cell[0] + direction[0], cell[1] + direction[1])
-        if 1 <= farNeighbor[0] < height-1 and 1 <= farNeighbor[1] < width-1 and farNeighbor not in visited: # Within scopes
-            return farNeighbor
+        if 1 <= farNeighbor[0] < width-1 and 1 <= farNeighbor[1] < height-1: #If possible x & y directions inside borders 
+            if farNeighbor not in visited: # Within scopes
+                return farNeighbor
         
         if not farNeighbor:
             maze[nearNeighbor[0]][nearNeighbor[1]] = 0 # Break the wall edge case (prevents nonconnected paths)
@@ -94,14 +95,14 @@ class maze(arcade.Window):
         self.player = None
         self.wall_collide = None
 
-        # store sprites in list to referrence later
+        # Store sprites in list to referrence later
         self.wall_list = None
         self.items_list = None
         self.camera = None
         self.score = 0
 
-        #background music initialization + looping
-        #Commented out because unreliable on MacOS and dependenices are installed but still gives issues 
+        # Background music initialization + looping
+        # Commented out because unreliable on MacOS and dependenices are installed but still gives issues 
         #self.bg_music = arcade.Sound(":resources:music/funkyrobot.mp3", streaming=True)
         #self.bg_music.play(volume=0.10, loop = True)
 
@@ -111,7 +112,7 @@ class maze(arcade.Window):
         self.scene = arcade.Scene()
         self.dark_circle_sprite = arcade.Sprite("dark_circle.png")
 
-        #implementing sprites
+        # Initialize Sprites
         self.wall_list = arcade.SpriteList(use_spatial_hash=True)
         self.items_list = arcade.SpriteList(use_spatial_hash=True)
 
@@ -149,16 +150,15 @@ class maze(arcade.Window):
             self.scene.add_sprite("Coins", coin)
                     
 
-        #physics engine for walls (collide)
+        # Physics engine for walls (collide)
         self.wall_collide = arcade.PhysicsEngineSimple(self.player, self.scene.get_sprite_list("Walls"))
         
-    
     def on_draw(self):
         '''Draw components onto canvas to make visible'''
         self.clear()
         self.wall_list.draw()
         self.items_list.draw()
-        self.dark_circle_sprite.draw()
+        #self.dark_circle_sprite.draw()
         self.camera.use()
         self.player.draw()  
         self.center_camera_to_player()
@@ -170,7 +170,7 @@ class maze(arcade.Window):
         self.dark_circle_sprite.center_x = self.player.center_x
         self.dark_circle_sprite.center_y = self.player.center_y
         
-        #prevent players from leaving path
+        # Prevent players from leaving path
         self.wall_collide.update()
         self.center_camera_to_player()
         coin_touch = arcade.check_for_collision_with_list(self.player,self.items_list)
@@ -186,6 +186,7 @@ class maze(arcade.Window):
 
 
     def center_camera_to_player(self):
+        '''Get (x,y) of player sprite. Used for centering dark_circle and displaying text'''
         screen_center_x = self.player.center_x - (self.camera.viewport_width / 2)
         screen_center_y = self.player.center_y - (self.camera.viewport_height / 2)
 
@@ -198,6 +199,8 @@ class maze(arcade.Window):
             arcade.draw_text(f"You Win!" , start_x=screen_center_x + 440, start_y=screen_center_y + 550, color=arcade.color.BLUE, font_size=20)
 
     def on_key_press(self, key, modifiers):
+
+        # Animations for player based on movement
         player_left = arcade.load_texture(":resources:images/animated_characters/male_person/malePerson_walk2.png", flipped_horizontally= True)
         player_right = arcade.load_texture(":resources:images/animated_characters/male_person/malePerson_walk2.png")
         player_down = arcade.load_texture(":resources:images/animated_characters/male_person/malePerson_walk0.png")
@@ -221,6 +224,7 @@ class maze(arcade.Window):
             
 
     def on_key_release(self, key, modifiers):
+
         player_idle = arcade.load_texture(":resources:images/animated_characters/male_person/malePerson_idle.png")
 
         if key == arcade.key.UP or key == arcade.key.W:
