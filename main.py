@@ -193,7 +193,7 @@ class maze(arcade.Window):
 
         self.camera.move_to(player_centered)
 
-        arcade.draw_text(f"Score: {self.score}", start_x=screen_center_x + 820, start_y=screen_center_y + 630, color=arcade.color.WHITE, font_size=20)
+        arcade.draw_text(f"Coins Collected: {self.score}/{NUM_OF_COINS}", start_x=screen_center_x + 700, start_y=screen_center_y + 630, color=arcade.color.WHITE, font_size=20)
         if self.score == NUM_OF_COINS:
             arcade.draw_text(f"You Win!" , start_x=screen_center_x + 440, start_y=screen_center_y + 550, color=arcade.color.BLUE, font_size=20)
 
